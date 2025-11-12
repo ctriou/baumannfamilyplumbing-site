@@ -1,9 +1,3 @@
 {
-  "routes": [
-    {
-      "route": "/",
-      "redirect": "https://www.baumannfamilyplumbing.com/",
-      "statusCode": 301
-    }
-  ]
+  
 }
