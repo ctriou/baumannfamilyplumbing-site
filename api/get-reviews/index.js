@@ -12,8 +12,8 @@ module.exports = async function (context, req) {
         return;
     }
 
-    const businessName = "Baumann Family Plumbing, Mesa, AZ";
-    const searchUrl = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(businessName)}&inputtype=textquery&fields=place_id&key=${apiKey}`;
+    const businessName = "Baumann Family Plumbing";
+    const searchUrl = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(businessName)}&inputtype=textquery&fields=place_id&key=${apiKey}&locationbias=circle:10000@33.552258,-111.779623`;
 
     try {
         const placeId = await new Promise((resolve, reject) => {
