@@ -12,7 +12,7 @@ module.exports = async function (context, req) {
         return;
     }
 
-    const businessName = "Baumann Family Plumbing";
+    const businessName = "Baumann Family Plumbing, Mesa, AZ";
     const searchUrl = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(businessName)}&inputtype=textquery&fields=place_id&key=${apiKey}`;
 
     try {
