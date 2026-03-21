@@ -2,10 +2,13 @@ const https = require('https');
 
 module.exports = async function (context, req) {
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
-    context.log("Function triggered. API Key exists:", !!apiKey);
     
+    // Explicit debug check for the environment variable
     if (!apiKey) {
-        context.res = { status: 500, body: "API Key missing in environment." };
+        context.res = { 
+            status: 500, 
+            body: "DEBUG ERROR: GOOGLE_PLACES_API_KEY environment variable is NOT SET in Azure App Settings." 
+        };
         return;
     }
 
@@ -18,15 +21,18 @@ module.exports = async function (context, req) {
                 let data = '';
                 res.on('data', (chunk) => data += chunk);
                 res.on('end', () => {
-                    const json = JSON.parse(data);
-                    context.log("Search result:", JSON.stringify(json));
-                    if (json.candidates && json.candidates.length > 0) {
-                        resolve(json.candidates[0].place_id);
-                    } else {
-                        reject('Place not found: ' + JSON.stringify(json));
+                    try {
+                        const json = JSON.parse(data);
+                        if (json.status === "OK" && json.candidates && json.candidates.length > 0) {
+                            resolve(json.candidates[0].place_id);
+                        } else {
+                            reject('Google Search Error: ' + JSON.stringify(json));
+                        }
+                    } catch (e) {
+                        reject('JSON Parse Error: ' + e.message);
                     }
                 });
-            }).on('error', (e) => reject(e.message));
+            }).on('error', (e) => reject('HTTPS Request Error: ' + e.message));
         });
 
         const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=reviews&key=${apiKey}`;
@@ -36,16 +42,22 @@ module.exports = async function (context, req) {
                 let data = '';
                 res.on('data', (chunk) => data += chunk);
                 res.on('end', () => {
-                    const json = JSON.parse(data);
-                    context.log("Details result:", JSON.stringify(json));
-                    resolve(json.result ? json.result.reviews : []);
+                    try {
+                        const json = JSON.parse(data);
+                        if (json.status === "OK") {
+                            resolve(json.result ? json.result.reviews : []);
+                        } else {
+                            reject('Google Details Error: ' + JSON.stringify(json));
+                        }
+                    } catch (e) {
+                        reject('JSON Parse Error: ' + e.message);
+                    }
                 });
-            }).on('error', (e) => reject(e.message));
+            }).on('error', (e) => reject('HTTPS Request Error: ' + e.message));
         });
 
         context.res = { status: 200, body: reviews };
     } catch (error) {
-        context.log.error("Function error:", error);
         context.res = { status: 500, body: "Internal Server Error: " + error };
     }
 };
