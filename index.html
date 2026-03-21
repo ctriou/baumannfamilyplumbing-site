@@ -1154,63 +1154,43 @@
     <section id="reviews" class="reviews">
         <div class="container">
             <h2 class="section-title">What Our Customers Say</h2>
-            <p style="text-align: center; margin-bottom: 1rem; color: #cccccc; font-size: 1.2rem;">
-                ⭐ Exceptional 5.0 out of 5 - 60 Verified Thumbtack Reviews
-            </p>
-            <p style="text-align: center; margin-bottom: 3rem;">
-                <a href="https://www.thumbtack.com/az/mesa/affordable-plumbing-services/baumann-family-plumbing/service/428954510333575196" target="_blank" style="color: #3498db; text-decoration: none; font-weight: 600; font-size: 1.1rem;">View All Reviews on Thumbtack →</a>
-            </p>
-            <div class="reviews-container">
-                <div class="review-card">
-                    <div class="thumbtack-logo">👍</div>
-                    <div class="stars">★★★★★ (5.0)</div>
-                    <p class="review-text">"Clint did an excellent job installing a garbage disposal for me. Arrived on time and was extremely skilled and completed the job quickly. Extremely fair pricing too! Will definitely use him again for other plumbing needs around my house."</p>
-                    <div class="reviewer">- Mike S.</div>
-                    <small style="color: #999; font-size: 0.9rem;">Verified Thumbtack Review • Nov 2021</small>
-                </div>
-                
-                <div class="review-card">
-                    <div class="thumbtack-logo">👍</div>
-                    <div class="stars">★★★★★ (5.0)</div>
-                    <p class="review-text">"I reached out to Baumann Plumbing to help fix a clogged sink and leaking garbage disposal. Clint was very responsive. He was available right away. He replaced my garbage disposal at a very reasonable price, compared to other estimates that I received. I've already discussed another job with him. Highly recommend"</p>
-                    <div class="reviewer">- Nedenia W.</div>
-                    <small style="color: #999; font-size: 0.9rem;">Verified Thumbtack Review • Sep 2021</small>
-                </div>
-                
-                <div class="review-card">
-                    <div class="thumbtack-logo">👍</div>
-                    <div class="stars">★★★★★ (5.0)</div>
-                    <p class="review-text">"Clint was quick to respond to my request for a toilet installation, and called to ask if he could come by a bit earlier than scheduled which was nice! The install was done quickly and efficiently. I definitely will be reaching out for any future plumbing needs."</p>
-                    <div class="reviewer">- Greg T.</div>
-                    <small style="color: #999; font-size: 0.9rem;">Verified Thumbtack Review • May 2022</small>
-                </div>
-                
-                <div class="review-card">
-                    <div class="thumbtack-logo">👍</div>
-                    <div class="stars">★★★★★ (5.0)</div>
-                    <p class="review-text">"I hired this company to install a new hot water heater in my house based on other peoples good reviews & I'm so glad I did! The owner was actually the one who did the work not just a random employee. He was in and out quickly and everything looks and works great. Super friendly and punctual. I even hired him to come back and fix a few other plumbing issues I'm having around the house.. A++"</p>
-                    <div class="reviewer">- Laura J.</div>
-                    <small style="color: #999; font-size: 0.9rem;">Verified Thumbtack Review • May 2022</small>
-                </div>
-                
-                <div class="review-card">
-                    <div class="thumbtack-logo">👍</div>
-                    <div class="stars">★★★★★ (5.0)</div>
-                    <p class="review-text">"Clint was responsive when I reached out to get my freestanding bathtub and bathroom fixtures installed. I would HIGHLY recommend and will be working with him for future plumbing needs."</p>
-                    <div class="reviewer">- Alan N.</div>
-                    <small style="color: #999; font-size: 0.9rem;">Verified Thumbtack Review • Mar 2022</small>
-                </div>
-                
-                <div class="review-card">
-                    <div class="thumbtack-logo">👍</div>
-                    <div class="stars">★★★★★ (5.0)</div>
-                    <p class="review-text">"Great experience with Baumann Plumbing! Professional, courteous, and very knowledgeable. Fixed our plumbing issues quickly and at a fair price. Will definitely call them again for any future needs."</p>
-                    <div class="reviewer">- Robert M.</div>
-                    <small style="color: #999; font-size: 0.9rem;">Verified Thumbtack Review • Jun 2022</small>
-                </div>
+            <div id="reviews-container" class="reviews-container">
+                <p style="text-align: center;">Loading reviews...</p>
             </div>
         </div>
     </section>
+
+    <script>
+        async function loadReviews() {
+            const container = document.getElementById('reviews-container');
+            try {
+                const response = await fetch('/api/get-reviews');
+                if (!response.ok) throw new Error('Failed to fetch');
+                const reviews = await response.json();
+                
+                container.innerHTML = '';
+                if (reviews.length === 0) {
+                    container.innerHTML = '<p style="text-align: center;">No reviews available.</p>';
+                    return;
+                }
+                
+                reviews.forEach(review => {
+                    const card = document.createElement('div');
+                    card.className = 'review-card';
+                    card.innerHTML = `
+                        <div class="stars">${'★'.repeat(Math.floor(review.rating))}</div>
+                        <p class="review-text">"${review.text}"</p>
+                        <div class="reviewer">- ${review.author_name}</div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                container.innerHTML = '<p style="text-align: center;">Unable to load reviews.</p>';
+                console.error(error);
+            }
+        }
+        loadReviews();
+    </script>
 
     <!-- Contact Section -->
     <section id="contact" class="contact">
